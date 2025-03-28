@@ -47,6 +47,8 @@ function fetchAndRenderImages() {
     .then(data => {
       totalHits = data.totalHits;
       renderGallery(data.hits);
+      smoothScroll();
+
       lightbox.refresh();
 
       if (currentPage * perPage < totalHits) {
@@ -65,4 +67,15 @@ function fetchAndRenderImages() {
     .finally(() => {
       loader.style.display = 'none';
     });
+}
+
+function smoothScroll() {
+  const gallery = document.querySelector('.gallery');
+  const cardHeight =
+    gallery.firstElementChild?.getBoundingClientRect().height || 0;
+
+  window.scrollBy({
+    top: cardHeight * 2,
+    behavior: 'smooth',
+  });
 }
