@@ -40,33 +40,30 @@ loadMoreBtn.addEventListener('click', () => {
   fetchAndRenderImages();
 });
 
-function fetchAndRenderImages() {
+async function fetchAndRenderImages() {
   loader.style.display = 'block';
+  try {
+    let data = await fetchImages(currentQuery, currentPage, perPage);
+    totalHits = data.totalHits;
+    renderGallery(data.hits);
+    smoothScroll();
 
-  fetchImages(currentQuery, currentPage, perPage)
-    .then(data => {
-      totalHits = data.totalHits;
-      renderGallery(data.hits);
-      smoothScroll();
+    lightbox.refresh();
 
-      lightbox.refresh();
+    if (currentPage * perPage < totalHits) {
+      loadMoreBtn.style.display = 'block';
+    } else {
+      loadMoreBtn.style.display = 'none';
+      iziToast.info({
+        title: 'End',
+        message: 'Ви дійшли до кінця результатів пошуку.',
+      });
+    }
+  } catch (error) {
+    iziToast.error({ title: 'Error', message: error.message });
+  }
 
-      if (currentPage * perPage < totalHits) {
-        loadMoreBtn.style.display = 'block';
-      } else {
-        loadMoreBtn.style.display = 'none';
-        iziToast.info({
-          title: 'End',
-          message: 'Ви дійшли до кінця результатів пошуку.',
-        });
-      }
-    })
-    .catch(error => {
-      iziToast.error({ title: 'Error', message: error.message });
-    })
-    .finally(() => {
-      loader.style.display = 'none';
-    });
+  loader.style.display = 'none';
 }
 
 function smoothScroll() {
